@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Custom Apple-inspired styles */
+    body {
+        background-color: #F5F5F7;
+        /* Apple light gray */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+
+    .apple-card {
+        background: #FFFFFF;
+        border-radius: 18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .apple-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .apple-btn {
+        background-color: #007AFF;
+        /* Apple Blue */
+        color: white;
+        border-radius: 12px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+
+    .apple-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-completed {
+        background-color: #E4F9E4;
+        color: #1C8E1C;
+    }
+
+    .status-pending {
+        background-color: #FFF4CE;
+        color: #9A6B00;
+    }
+
+    .status-processing {
+        background-color: #E0F2FE;
+        color: #0284C7;
+    }
+
+    .status-failed {
+        background-color: #FFE4E4;
+        color: #D32F2F;
+    }
+</style>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="text-gray-500 mt-1">System Overview & Management</p>
+        </div>
+        <div>
+            <a href="{% url 'register' %}" class="apple-btn inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clip-rule="evenodd" />
+                </svg>
+                Add New User
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <!-- Total Users Card -->
+        <div class="apple-card p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Total Users</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <span class="text-4xl font-extrabold text-gray-900">{{ total_users }}</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Requests Card -->
+        <div class="apple-card p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Total Requests</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <span class="text-4xl font-extrabold text-gray-900">{{ total_requests }}</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-indigo-50 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status Card -->
+        <div class="apple-card p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">System Status</h3>
+                    <div class="mt-2 flex items-center">
+                        <span class="flex h-3 w-3 relative mr-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                        <span class="text-lg font-bold text-gray-900">Operational</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-green-50 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Requests Section -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-[18px] shadow-sm overflow-hidden border border-gray-100">
+                <div class="border-b border-gray-100 p-5 flex justify-between items-center bg-gray-50/50">
+                    <h2 class="font-bold text-gray-800 text-lg">Recent Forensic Requests</h2>
+                    <a href="#" class="text-sm text-blue-500 hover:text-blue-700 font-medium">View All</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr
+                                class="text-gray-500 border-b border-gray-100 text-xs uppercase tracking-wider bg-gray-50/30">
+                                <th class="p-4 font-medium">ID</th>
+                                <th class="p-4 font-medium">User</th>
+                                <th class="p-4 font-medium">Date</th>
+                                <th class="p-4 font-medium">Status</th>
+                                <th class="p-4 font-medium text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {% for req in recent_requests %}
+                            <tr class="hover:bg-gray-50/80 transition-colors">
+                                <td class="p-4 text-gray-700 font-medium">#{{ req.id }}</td>
+                                <td class="p-4 text-gray-600">{{ req.user.username }}</td>
+                                <td class="p-4 text-gray-500 text-sm">{{ req.created_at|date:"M d, H:i" }}</td>
+                                <td class="p-4">
+                                    <span class="status-badge status-{{ req.status|lower }}">
+                                        {{ req.status }}
+                                    </span>
+                                </td>
+                                <td class="p-4 text-right">
+                                    <a href="{% url 'request_detail' req.id %}"
+                                        class="text-blue-500 hover:text-blue-700 text-sm font-medium">View Result</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-gray-400">
+                                    No requests found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Quick View -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-[18px] shadow-sm overflow-hidden border border-gray-100 h-full">
+                <div class="border-b border-gray-100 p-5 bg-gray-50/50">
+                    <h2 class="font-bold text-gray-800 text-lg">Registered Users</h2>
+                </div>
+                <div class="p-0">
+                    <ul class="divide-y divide-gray-50">
+                        {% for u in users %}
+                        <li class="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                            <div class="flex items-center">
+                                <div
+                                    class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-blue-600 font-bold mr-3">
+                                    {{ u.username|first|upper }}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800">{{ u.username }}</p>
+                                    <p class="text-xs text-gray-500">{{ u.email }}</p>
+                                </div>
+                            </div>
+                            {% if u.is_superuser %}
+                            <span
+                                class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-md font-medium">Admin</span>
+                            {% else %}
+                            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">User</span>
+                            {% endif %}
+                        </li>
+                        {% empty %}
+                        <li class="p-6 text-center text-gray-400">No users found.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="p-4 border-t border-gray-100 bg-gray-50/30 text-center">
+                    <p class="text-xs text-gray-400">Displaying recent users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

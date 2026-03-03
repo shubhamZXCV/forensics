@@ -1,0 +1,32 @@
+r), this stage was not applicable. This does not negate the tampering  it simply indicates th
+at the tampering is **not facial** but **background-based**.
+
+**Note**:
+This is not a failure of the model  it is a limitation of the input data. Background manipula
+tion does not require facial detection, and TruFors mask is sufficient to indicate synthetic
+content.
+
+---
+
+### **Stage 4: Audio Spoofing (RawNet)**
+**Model Output**:
+- Not applicable
+- Reason: No audio component provided or detected.
+
+**Analysis**:
+Audio analysis was not performed because no audio file was submitted. Therefore, this stage is
+ **not applicable** to the current case. No audio spoofing can be evaluated.
+
+---
+
+### **Stage 5: Document Tampering (EdgeDoc)**
+**Model Output**:
+- Not applicable
+- Reason: Media is not a document (e.g., PDF, scanned form, etc.). Appears to be a video frame
+ or image.
+
+**Analysis**:
+EdgeDoc is designed for analyzing document structures, edges, and text manipulation. Since the
+ media is a **video frame or image**, not a document,
+Process finished. You can close this window.
+(base) nutrition@drishti:~/forensics_shubham/web$

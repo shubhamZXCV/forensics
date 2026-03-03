@@ -1,0 +1,4 @@
+[2026-03-03 08:42:41,255: WARNING/MainProcess] No hostname was supplied. Reverting to default 'localhost'
+[2026-03-03 08:42:41,278: WARNING/MainProcess] No hostname was supplied. Reverting to default 'localhost'
+[2026-03-03 08:42:41,279: INFO/MainProcess] Connected to filesystem://localhost//
+[2026-03-03 08:42:41,282: INFO/MainProcess] celery@drishti ready.

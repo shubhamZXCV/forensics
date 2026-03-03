@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Left Column: New Request Form -->
+    <div class="lg:col-span-4 self-start sticky top-24">
+        <div class="apple-card p-6">
+            <h2 class="text-xl font-bold mb-6 text-gray-900 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-500" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                New Analysis Request
+            </h2>
+            <form method="post" enctype="multipart/form-data" class="space-y-5">
+                {% csrf_token %}
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Upload File</label>
+                    <div
+                        class="relative border-2 border-dashed border-gray-300 rounded-xl p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer">
+                        {{ form.input_file }}
+                        <div class="pointer-events-none absolute inset-0 flex items-center justify-center"
+                            id="upload-placeholder">
+                            <span class="text-gray-400 text-sm">Drag file or click to upload</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Media Type</label>
+                    <div class="relative">
+                        {{ form.media_type }}
+                        <!-- Assuming the form widget isn't styled, we might need CSS to style select/input -->
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Select Models</label>
+                    <div class="bg-gray-50 p-4 rounded-xl space-y-3">
+                        {% for checkbox in form.selected_models %}
+                        <label
+                            class="flex items-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all cursor-pointer">
+                            {{ checkbox.tag }}
+                            <span class="ml-3 text-sm text-gray-700 font-medium">{{ checkbox.choice_label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white rounded-xl px-4 py-3 font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30">
+                    Submit Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Request List -->
+    <div class="lg:col-span-8">
+        <div class="apple-card overflow-hidden">
+            <div class="border-b border-gray-100 p-6 flex justify-between items-center bg-gray-50/50">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    Your Requests
+                </h2>
+                <span class="bg-gray-200 text-gray-600 py-1 px-3 rounded-full text-xs font-bold">{{ requests.count }}
+                    Total</span>
+            </div>
+
+            {% if requests %}
+            <ul class="divide-y divide-gray-100">
+                {% for req in requests %}
+                <li class="p-5 hover:bg-gray-50 transition-colors">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0
+                                {% if req.media_type == 'image' %}bg-purple-100 text-purple-600
+                                {% else %}bg-pink-100 text-pink-600{% endif %}">
+                                {% if req.media_type == 'image' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path
+                                        d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                                </svg>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">Request #{{ req.id }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">{{ req.created_at|date:"M d, Y • H:i" }}</p>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    {% for model in req.selected_models %}
+                                    <span
+                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                        {{ model }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+                                {% if req.status == 'COMPLETED' %}bg-green-100 text-green-700
+                                {% elif req.status == 'FAILED' %}bg-red-100 text-red-700
+                                {% else %}bg-yellow-100 text-yellow-700 animate-pulse{% endif %}">
+                                {{ req.status }}
+                            </span>
+
+                            <a href="{% url 'request_detail' req.id %}"
+                                class="text-gray-400 hover:text-blue-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="p-10 text-center">
+                <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">No requests yet</h3>
+                <p class="mt-1 text-sm text-gray-500">Upload a file to get started with your first analysis.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling for the Django form inputs */
+    input[type="file"] {
+        width: 100%;
+        color: transparent;
+    }
+
+    input[type="file"]::file-selector-button {
+        display: none;
+    }
+
+    select {
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid #d1d5db;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.querySelector('input[type="file"]');
+    const mediaSelect = document.querySelector('select[name="media_type"]');
+    const placeholder = document.getElementById('upload-placeholder');
+    
+    if(fileInput && mediaSelect) {
+        fileInput.addEventListener('change', function(e) {
+            const file = this.files[0];
+            if(file) {
+                // Auto-select media type
+                if(file.type.startsWith('video/')) {
+                    mediaSelect.value = 'video';
+                } else if(file.type.startsWith('image/')) {
+                    mediaSelect.value = 'image';
+                }
+                
+                // Show preview
+                placeholder.innerHTML = '';
+                const url = URL.createObjectURL(file);
+                if(file.type.startsWith('image/')) {
+                    placeholder.innerHTML = `<img src="${url}" class="max-h-full max-w-full object-contain rounded shadow-sm" style="max-height: 15rem" />`;
+                } else if(file.type.startsWith('video/')) {
+                    placeholder.innerHTML = `<video src="${url}" class="max-h-full max-w-full object-contain rounded shadow-sm" style="max-height: 15rem" controls></video>`;
+                } else {
+                    placeholder.innerHTML = `<span class="text-blue-600 text-sm font-medium border border-blue-200 bg-blue-50 px-3 py-1 rounded-full">${file.name}</span>`;
+                }
+            } else {
+                placeholder.innerHTML = '<span class="text-gray-400 text-sm">Drag file or click to upload</span>';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

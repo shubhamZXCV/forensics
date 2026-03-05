@@ -1,6 +1,6 @@
 from celery import shared_task
 from .models import ForensicRequest, AnalysisResult
-from .utils import run_model_wrapper
+from .utils import run_model_wrapper, RESTRICTED_MODELS
 # from .llm import generate_report # To be implemented
 import json
 
@@ -18,7 +18,13 @@ def process_forensic_request(request_id):
         
         all_results = {}
         
-        for model_name in req.selected_models:
+        # Security check: Filter out restricted models for non-admin users
+        models_to_run = req.selected_models
+        if not req.user.is_superuser:
+            models_to_run = [m for m in models_to_run if m not in RESTRICTED_MODELS]
+            logger.info(f"🔐 [Task] Non-admin user detected. Filtered out restricted models. Running: {models_to_run}")
+        
+        for model_name in models_to_run:
             logger.info(f"🔍 [Task] Running model: {model_name}")
             
             # Create Model Log

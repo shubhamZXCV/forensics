@@ -30,8 +30,15 @@ MODELS = {
     "edgedoc": ("stage5_edgedoc", "runner.py"),
 }
 
-def get_available_models():
-    return list(MODELS.keys())
+# Models restricted to admin users only
+RESTRICTED_MODELS = {"rawnet", "aasist", "rtm", "edgedoc"}
+
+def get_available_models(is_admin=False):
+    """Get available models. Non-admin users get filtered list."""
+    all_models = list(MODELS.keys())
+    if is_admin:
+        return all_models
+    return [m for m in all_models if m not in RESTRICTED_MODELS]
 
 def run_model_wrapper(model_name, input_path):
     """

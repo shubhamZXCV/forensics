@@ -2,3 +2,5 @@ models_data/
 venv_django/
 .env
 assets/
+web/media
+ext_models/

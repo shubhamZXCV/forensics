@@ -1,213 +1,220 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-    <!-- Left Column: New Request Form -->
-    <div class="lg:col-span-4 self-start sticky top-24">
-        <div class="apple-card p-6">
-            <h2 class="text-xl font-bold mb-6 text-gray-900 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-500" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                New Analysis Request
-            </h2>
-            <form method="post" enctype="multipart/form-data" class="space-y-5">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+
+        <!-- Header -->
+        <div class="text-center mb-16">
+            <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+                Forensic Analysis
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Upload your video for comprehensive forensic analysis.
+            </p>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="apple-card overflow-hidden bg-white border-2 border-blue-100 mb-12">
+            <form method="post" enctype="multipart/form-data" id="upload-form">
                 {% csrf_token %}
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Upload File</label>
-                    <div
-                        class="relative border-2 border-dashed border-gray-300 rounded-xl p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer">
-                        {{ form.input_file }}
-                        <div class="pointer-events-none absolute inset-0 flex items-center justify-center"
-                            id="upload-placeholder">
-                            <span class="text-gray-400 text-sm">Drag file or click to upload</span>
-                        </div>
-                    </div>
+                <!-- Upload Area -->
+                <div class="p-12 text-center border-b border-gray-100 cursor-pointer"
+                     id="upload-container">
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-2">
+                        Drop your video here
+                    </h3>
+                    <p class="text-gray-600 mb-4">or click to select a file</p>
+
+                    <input type="file"
+                           id="video-input"
+                           name="input_file"
+                           accept="video/*, image/*"
+                           class="hidden"
+                           required>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Media Type</label>
-                    <div class="relative">
-                        {{ form.media_type }}
-                        <!-- Assuming the form widget isn't styled, we might need CSS to style select/input -->
-                    </div>
-                </div>
+                <!-- Preview -->
+                <div id="preview-area"
+                     class="hidden p-12 bg-blue-50 border-t border-gray-100">
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Select Models</label>
-                    <div class="bg-gray-50 p-4 rounded-xl space-y-3">
-                        {% for checkbox in form.selected_models %}
-                        <label
-                            class="flex items-center p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all cursor-pointer">
-                            {{ checkbox.tag }}
-                            <span class="ml-3 text-sm text-gray-700 font-medium">{{ checkbox.choice_label }}</span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                </div>
+                    <p id="file-name"
+                       class="text-lg font-semibold text-gray-900 mb-2 text-center"></p>
 
-                <button type="submit"
-                    class="w-full bg-blue-600 text-white rounded-xl px-4 py-3 font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30">
-                    Submit Request
-                </button>
-            </form>
-        </div>
-    </div>
+                    <p id="file-size"
+                       class="text-sm text-gray-600 mb-6 text-center"></p>
 
-    <!-- Right Column: Request List -->
-    <div class="lg:col-span-8">
-        <div class="apple-card overflow-hidden">
-            <div class="border-b border-gray-100 p-6 flex justify-between items-center bg-gray-50/50">
-                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-500" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                    Your Requests
-                </h2>
-                <span class="bg-gray-200 text-gray-600 py-1 px-3 rounded-full text-xs font-bold">{{ requests.count }}
-                    Total</span>
-            </div>
-
-            {% if requests %}
-            <ul class="divide-y divide-gray-100">
-                {% for req in requests %}
-                <li class="p-5 hover:bg-gray-50 transition-colors">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div class="flex items-start space-x-4">
-                            <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0
-                                {% if req.media_type == 'image' %}bg-purple-100 text-purple-600
-                                {% else %}bg-pink-100 text-pink-600{% endif %}">
-                                {% if req.media_type == 'image' %}
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                {% else %}
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                                </svg>
-                                {% endif %}
-                            </div>
-                            <div>
-                                <p class="text-sm font-semibold text-gray-900">Request #{{ req.id }}</p>
-                                <p class="text-xs text-gray-500 mt-0.5">{{ req.created_at|date:"M d, Y • H:i" }}</p>
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    {% for model in req.selected_models %}
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                        {{ model }}
-                                    </span>
-                                    {% endfor %}
+                    <!-- Model Selection for Admin -->
+                    <div id="model-selection">
+                        {% if is_admin %}
+                            <div class="mb-8 border-t border-gray-200 pt-6">
+                                <label class="block text-sm font-semibold text-gray-700 mb-4">Select Detection Models</label>
+                                <div class="bg-white p-4 rounded-lg border border-gray-200 space-y-3 max-h-48 overflow-y-auto">
+                                    {{ form.selected_models }}
                                 </div>
                             </div>
-                        </div>
+                        {% else %}
+                            <!-- Hidden input for non-admin: all models auto-selected -->
+                            <div style="display: none;">
+                                {{ form.selected_models }}
+                            </div>
+                        {% endif %}
+                    </div>
 
-                        <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
-                                {% if req.status == 'COMPLETED' %}bg-green-100 text-green-700
-                                {% elif req.status == 'FAILED' %}bg-red-100 text-red-700
-                                {% else %}bg-yellow-100 text-yellow-700 animate-pulse{% endif %}">
+                    <div class="flex gap-4 justify-center">
+                        <button id="change-btn"
+                                type="button"
+                                class="px-6 py-2 border rounded-lg hover:bg-gray-50 font-medium">
+                            Change File
+                        </button>
+
+                        <button type="submit"
+                                class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                            Analyze Video
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error -->
+                {% if form.input_file.errors %}
+                <div class="p-6 bg-red-50 border-t border-red-200">
+                    <p class="text-red-700 text-sm">
+                        {{ form.input_file.errors.0 }}
+                    </p>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Recent Requests -->
+        <div class="mt-16 pt-16 border-t border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                Recent Analyses
+            </h2>
+
+            {% if requests %}
+                <ul class="space-y-4">
+                    {% for req in requests %}
+                    <li class="apple-card p-6 hover:shadow-lg transition">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">
+                                    Request #{{ req.id }}
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    {{ req.created_at|date:"M d, Y H:i" }}
+                                </p>
+                            </div>
+
+                            <span class="px-3 py-1 rounded-full text-xs font-bold
+                                {% if req.status == 'COMPLETED' %}
+                                    bg-green-100 text-green-700
+                                {% elif req.status == 'FAILED' %}
+                                    bg-red-100 text-red-700
+                                {% else %}
+                                    bg-yellow-100 text-yellow-700
+                                {% endif %}">
                                 {{ req.status }}
                             </span>
+                        </div>
 
+                        <div class="mt-3">
                             <a href="{% url 'request_detail' req.id %}"
-                                class="text-gray-400 hover:text-blue-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5l7 7-7 7" />
-                                </svg>
+                               class="text-blue-600 hover:underline text-sm">
+                                View Details →
                             </a>
                         </div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
             {% else %}
-            <div class="p-10 text-center">
-                <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
+                <div class="p-10 text-center">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        No requests yet
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Upload a file to get started.
+                    </p>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900">No requests yet</h3>
-                <p class="mt-1 text-sm text-gray-500">Upload a file to get started with your first analysis.</p>
-            </div>
             {% endif %}
         </div>
+
     </div>
 </div>
 
-<style>
-    /* Styling for the Django form inputs */
-    input[type="file"] {
-        width: 100%;
-        color: transparent;
-    }
-
-    input[type="file"]::file-selector-button {
-        display: none;
-    }
-
-    select {
-        width: 100%;
-        border-radius: 0.75rem;
-        border: 1px solid #d1d5db;
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-    }
-</style>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.querySelector('input[type="file"]');
-    const mediaSelect = document.querySelector('select[name="media_type"]');
-    const placeholder = document.getElementById('upload-placeholder');
-    
-    if(fileInput && mediaSelect) {
-        fileInput.addEventListener('change', function(e) {
-            const file = this.files[0];
-            if(file) {
-                // Auto-select media type
-                if(file.type.startsWith('video/')) {
-                    mediaSelect.value = 'video';
-                } else if(file.type.startsWith('image/')) {
-                    mediaSelect.value = 'image';
-                }
-                
-                // Show preview
-                placeholder.innerHTML = '';
-                const url = URL.createObjectURL(file);
-                if(file.type.startsWith('image/')) {
-                    placeholder.innerHTML = `<img src="${url}" class="max-h-full max-w-full object-contain rounded shadow-sm" style="max-height: 15rem" />`;
-                } else if(file.type.startsWith('video/')) {
-                    placeholder.innerHTML = `<video src="${url}" class="max-h-full max-w-full object-contain rounded shadow-sm" style="max-height: 15rem" controls></video>`;
-                } else {
-                    placeholder.innerHTML = `<span class="text-blue-600 text-sm font-medium border border-blue-200 bg-blue-50 px-3 py-1 rounded-full">${file.name}</span>`;
-                }
-            } else {
-                placeholder.innerHTML = '<span class="text-gray-400 text-sm">Drag file or click to upload</span>';
-            }
-        });
-    }
+document.addEventListener('DOMContentLoaded', function() {
+
+    const uploadContainer = document.getElementById('upload-container');
+    const videoInput = document.getElementById('video-input');
+    const previewArea = document.getElementById('preview-area');
+    const fileName = document.getElementById('file-name');
+    const fileSize = document.getElementById('file-size');
+    const changeBtn = document.getElementById('change-btn');
+    const uploadForm = document.getElementById('upload-form');
+
+    uploadContainer.addEventListener('click', () => videoInput.click());
+
+    videoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            fileSize.textContent =
+                (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+            uploadContainer.classList.add('hidden');
+            previewArea.classList.remove('hidden');
+        }
+    });
+
+    changeBtn.addEventListener('click', () => {
+        videoInput.value = '';
+        previewArea.classList.add('hidden');
+        uploadContainer.classList.remove('hidden');
+    });
+
+    uploadForm.addEventListener('submit', function(e) {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = "Uploading...";
+    });
+
 });
 </script>
+
+<style>
+/* Style for model selection checkboxes */
+#model-selection input[type="checkbox"] {
+    margin-right: 0.75rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    accent-color: #2563eb;
+    border: 2px solid #d1d5db;
+    border-radius: 0.375rem;
+}
+
+#model-selection label {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+#model-selection label:hover {
+    background-color: #f9fafb;
+}
+
+#model-selection label > span {
+    margin-left: 0.75rem;
+    font-size: 0.875rem;
+    color: #1f2937;
+    font-weight: 500;
+}
+</style>
+
 {% endblock %}

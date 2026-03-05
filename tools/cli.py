@@ -25,6 +25,7 @@ MODELS = {
     "deepfakebench": ("stage3_deepfakebench", "runner.py"),
     "d3": ("stage3_d3", "runner.py"),
     "genconvit": ("stage3_genconvit", "runner.py"),
+    "busterX": ("stage3_busterX", "runner.py"),
     # Stage 4
     "rawnet": ("stage4_rawnet", "runner.py"),
     "aasist": ("stage4_aasist", "runner.py"),

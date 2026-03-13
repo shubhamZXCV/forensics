@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{% url 'request_detail' req.id %}"
+                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-6">
+                ← Back to Report
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900">Edit User Report</h1>
+            <p class="text-gray-600 mt-1">Request #{{ req.id }} • Edit the user-facing report before releasing it.</p>
+        </div>
+
+        <form method="post" id="edit-form">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Editor Panel -->
+                <div class="apple-card overflow-hidden bg-white">
+                    <div class="bg-gray-50 border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-gray-900">✏️ Markdown Editor</h2>
+                        <span class="text-xs text-gray-500">Markdown supported</span>
+                    </div>
+                    <div class="p-4">
+                        <textarea name="user_report" id="editor"
+                            class="w-full h-[70vh] p-4 font-mono text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            placeholder="Write the user-facing report here...">{{ req.user_report }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Live Preview Panel -->
+                <div class="apple-card overflow-hidden bg-white">
+                    <div class="bg-gray-50 border-b border-gray-100 px-6 py-4">
+                        <h2 class="text-lg font-semibold text-gray-900">👁️ Live Preview</h2>
+                    </div>
+                    <div class="p-6 overflow-y-auto h-[70vh]">
+                        <div class="prose prose-lg max-w-none text-gray-700" id="preview-content">
+                            <p class="text-gray-400 italic">Start typing to see preview...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-6 flex gap-4 justify-end">
+                <a href="{% url 'request_detail' req.id %}"
+                    class="px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
+                    Cancel
+                </a>
+                <button type="submit"
+                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition">
+                    💾 Save Changes
+                </button>
+                <button type="submit" name="save_and_approve" value="1"
+                    class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition"
+                    onclick="return confirm('Save and approve? The report will become visible to the user.')">
+                    ✅ Save & Approve
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview-content');
+
+        function updatePreview() {
+            const text = editor.value.trim();
+            if (text) {
+                preview.innerHTML = marked.parse(text);
+            } else {
+                preview.innerHTML = '<p class="text-gray-400 italic">Start typing to see preview...</p>';
+            }
+        }
+
+        // Update preview on input with debounce
+        let debounceTimer;
+        editor.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(updatePreview, 150);
+        });
+
+        // Initial render
+        updatePreview();
+    });
+</script>
+
+<style>
+    .prose h1 {
+        @apply text-2xl font-bold mb-4 mt-6;
+    }
+
+    .prose h2 {
+        @apply text-xl font-bold mb-3 mt-5;
+    }
+
+    .prose h3 {
+        @apply text-lg font-semibold mb-2 mt-4;
+    }
+
+    .prose p {
+        @apply mb-3 leading-relaxed;
+    }
+
+    .prose ul,
+    .prose ol {
+        @apply mb-3 ml-4;
+    }
+
+    .prose li {
+        @apply mb-1;
+    }
+
+    .prose code {
+        @apply bg-gray-100 px-2 py-1 rounded text-gray-900 text-sm font-mono;
+    }
+
+    .prose pre {
+        @apply bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto font-mono text-sm;
+    }
+</style>
+{% endblock %}

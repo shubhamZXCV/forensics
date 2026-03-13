@@ -6,6 +6,7 @@ class ForensicRequest(models.Model):
     STATUS_CHOICES = (
         ('PENDING', 'Pending'),
         ('PROCESSING', 'Processing'),
+        ('REVIEW', 'Pending Review'),
         ('COMPLETED', 'Completed'),
         ('FAILED', 'Failed'),
     )
@@ -15,7 +16,22 @@ class ForensicRequest(models.Model):
     media_type = models.CharField(max_length=10, choices=[('image', 'Image'), ('video', 'Video')])
     selected_models = models.JSONField(default=list) # List of model names
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
-    report_content = models.TextField(blank=True, null=True)
+    
+    # Reports
+    report_content = models.TextField(blank=True, null=True)  # Legacy — kept for backward compat
+    user_report = models.TextField(blank=True, null=True)     # Sanitized VLM report (no model names, no verdicts)
+    
+    # Evidence
+    evidence_dir = models.CharField(max_length=500, blank=True, null=True)
+    
+    # Admin approval workflow
+    report_approved = models.BooleanField(default=False)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='approved_requests'
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

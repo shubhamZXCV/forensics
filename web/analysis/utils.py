@@ -13,9 +13,7 @@ MODELS_ROOT = Path(env_models) if env_models else (PROJECT_ROOT / "models_data")
 MODELS = {
     # Stage 1
     "univfd": ("stage1_univfd", "runner.py"),
-    "rine": ("stage1_rine", "runner.py"),
     "bfree": ("stage1_bfree", "runner.py"),
-    "cnndetection": ("stage1_cnndetection", "runner.py"),
     # Stage 2
     "trufor": ("stage2_trufor", "runner.py"),
     # Stage 3
@@ -40,9 +38,14 @@ def get_available_models(is_admin=False):
         return all_models
     return [m for m in all_models if m not in RESTRICTED_MODELS]
 
-def run_model_wrapper(model_name, input_path):
+def run_model_wrapper(model_name, input_path, output_dir=None):
     """
     Runs a forensic model and returns (success, output_json, logs).
+    
+    Args:
+        model_name: Name of the model to run
+        input_path: Path to the input file
+        output_dir: Optional directory for GradCAM/mask outputs
     """
     if model_name not in MODELS:
         return False, None, f"Error: Unknown model '{model_name}'"
@@ -64,6 +67,11 @@ def run_model_wrapper(model_name, input_path):
     try:
         abs_input_path = os.path.abspath(input_path)
         cmd = [str(venv_python), str(script_path), "--input", abs_input_path]
+        
+        # Pass output_dir if provided (for GradCAM/mask outputs)
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+            cmd.extend(["--output_dir", str(output_dir)])
         
         # Run inside the model directory
         process = subprocess.Popen(

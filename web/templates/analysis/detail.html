@@ -2,270 +2,488 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-        
-        <!-- Header Section -->
+    <div class="max-w-5xl mx-auto">
+
+        <!-- Header -->
         <div class="mb-8">
-            <a href="{% url 'dashboard' %}" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <a href="{% url 'dashboard' %}"
+                class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Dashboard
             </a>
-            
+
             <div class="flex items-center justify-between gap-4 mb-6">
                 <div>
                     <h1 class="text-4xl font-bold text-gray-900">Analysis Report</h1>
-                    <p class="text-gray-600 mt-1">Request #{{ req.id }} • {{ req.created_at|date:"M d, Y \a\t H:i" }}</p>
+                    <p class="text-gray-600 mt-1">Request #{{ req.id }} • {{ req.created_at|date:"M d, Y \a\t H:i" }}
+                    </p>
                 </div>
-                <div class="text-right">
-                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold
+                <div class="flex items-center gap-3">
+                    <!-- Status Badge -->
+                    <span id="status-badge" class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold
                         {% if req.status == 'COMPLETED' %}bg-green-100 text-green-800
+                        {% elif req.status == 'REVIEW' %}bg-purple-100 text-purple-800
                         {% elif req.status == 'FAILED' %}bg-red-100 text-red-800
                         {% elif req.status == 'PROCESSING' %}bg-yellow-100 text-yellow-800 animate-pulse
                         {% else %}bg-gray-100 text-gray-800{% endif %}">
-                        {% if req.status == 'COMPLETED' %}
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                            COMPLETED
-                        {% elif req.status == 'PROCESSING' %}
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            PROCESSING
-                        {% elif req.status == 'FAILED' %}
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                            FAILED
-                        {% endif %}
-                        {{ req.status }}
+                        {% if req.status == 'COMPLETED' %}✅ COMPLETED
+                        {% elif req.status == 'REVIEW' %}📋 PENDING REVIEW
+                        {% elif req.status == 'PROCESSING' %}⏳ PROCESSING
+                        {% elif req.status == 'FAILED' %}❌ FAILED
+                        {% else %}{{ req.status }}{% endif %}
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- Main Report Section -->
-        {% if req.report_content %}
-            {% if req.status == 'COMPLETED' %}
-            <div class="apple-card overflow-hidden mb-8 bg-white">
-                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-green-900 mb-1">Analysis Complete</h2>
-                            <p class="text-green-700">Your video has been analyzed. See detailed findings below.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-8">
-                    <div class="prose prose-lg max-w-none text-gray-700" id="report-content">
-                        <div class="hidden" id="raw-markdown">{{ req.report_content }}</div>
-                    </div>
-                </div>
-                <div class="border-t border-gray-100 bg-gray-50 px-8 py-4 flex gap-3">
-                    <a href="{{ req.input_file.url }}" download class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        Download Video
-                    </a>
-                    <button onclick="window.print()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                        </svg>
-                        Print Report
-                    </button>
-                </div>
+        <!-- ============================================ -->
+        <!-- SECTION 1: Uploaded Media Preview            -->
+        <!-- ============================================ -->
+        <div class="apple-card overflow-hidden mb-8 bg-white">
+            <div class="bg-gray-50 border-b border-gray-100 px-8 py-4">
+                <h2 class="text-lg font-semibold text-gray-900">📎 Uploaded Media</h2>
             </div>
-            {% else %}
-            <div class="apple-card overflow-hidden mb-8 bg-white border-l-4 border-yellow-500">
-                <div class="bg-yellow-50 p-8 text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-yellow-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <h2 class="text-2xl font-bold text-yellow-900 mb-2">Analysis in Progress</h2>
-                    <p class="text-yellow-700 mb-4">Your video is being analyzed. This usually takes a few minutes.</p>
-                    <p class="text-sm text-yellow-600">The page will automatically refresh every 3 seconds.</p>
-                </div>
-            </div>
-            {% endif %}
-        {% endif %}
-
-        <!-- Technical Details (Collapsible) -->
-        <details class="apple-card group mb-8">
-            <summary class="cursor-pointer px-8 py-6 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition font-semibold text-gray-900">
-                <span class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-6l-8 8m0 0l-4-4m4 4l4-4" />
-                    </svg>
-                    Technical Details
-                </span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-            </summary>
-            
-            <div class="border-t border-gray-100 p-8 space-y-6">
-                <!-- Video Details -->
-                <div>
-                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Video Information</h3>
-                    <div class="bg-gray-50 rounded-lg p-4 space-y-2 font-mono text-sm text-gray-600">
-                        <div class="flex justify-between">
-                            <span>File:</span>
-                            <span class="text-gray-900 font-medium">{{ req.input_file.name }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Size:</span>
-                            <span class="text-gray-900 font-medium">{{ req.input_file.size|filesizeformat }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Uploaded:</span>
-                            <span class="text-gray-900 font-medium">{{ req.created_at|date:"M d, Y H:i:s" }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Model Results -->
-                {% if results %}
-                <div>
-                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Detection Models</h3>
-                    <div class="space-y-3">
-                        {% for result in results %}
-                        <div class="apple-card p-4 border-l-4 border-blue-500">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <h4 class="font-semibold text-gray-900 capitalize">{{ result.model_name }}</h4>
-                                    <p class="text-xs text-gray-500 mt-1">Completed at {{ result.completed_at|date:"H:i:s" }}</p>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-bold
-                                    {% if result.status == 'SUCCESS' %}bg-green-100 text-green-700
-                                    {% else %}bg-red-100 text-red-700{% endif %}">
-                                    {{ result.status }}
-                                </span>
-                            </div>
-                            
-                            {% if result.output_json %}
-                            <details class="mt-3 group">
-                                <summary class="cursor-pointer text-xs font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                    View Raw Output
-                                </summary>
-                                <div class="mt-2 bg-gray-900 rounded p-3 overflow-x-auto">
-                                    <pre class="text-xs text-green-400 font-mono">{{ result.output_json|safe }}</pre>
-                                </div>
-                            </details>
-                            {% endif %}
-
-                            {% if result.logs %}
-                            <details class="mt-3 group">
-                                <summary class="cursor-pointer text-xs font-medium text-gray-600 hover:text-gray-900 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                    View Execution Logs
-                                </summary>
-                                <div class="mt-2 bg-gray-900 rounded p-3 overflow-x-auto max-h-48">
-                                    <pre class="text-xs text-green-400 font-mono">{{ result.logs }}</pre>
-                                </div>
-                            </details>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
+            <div class="p-6 flex justify-center">
+                {% if is_video %}
+                <video controls class="max-h-96 rounded-lg shadow-lg" preload="metadata">
+                    <source src="{{ req.input_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                {% elif is_image %}
+                <img src="{{ req.input_file.url }}" alt="Uploaded Image"
+                    class="max-h-96 rounded-lg shadow-lg object-contain">
+                {% else %}
+                <a href="{{ req.input_file.url }}" download class="text-blue-600 hover:underline">Download File</a>
                 {% endif %}
             </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 2: Report Content                    -->
+        <!-- ============================================ -->
+        {% if req.status == 'PROCESSING' or req.status == 'PENDING' %}
+        <!-- Processing State -->
+        <div class="apple-card overflow-hidden mb-8 bg-white border-l-4 border-yellow-500">
+            <div class="bg-yellow-50 p-12 text-center">
+                <div class="text-6xl mb-4">⏳</div>
+                <h2 class="text-2xl font-bold text-yellow-900 mb-2">Analysis in Progress</h2>
+                <p class="text-yellow-700 mb-2">Your media is being analyzed by multiple detection systems.</p>
+                {% if is_admin %}
+                <p class="text-yellow-900 font-mono font-bold text-lg mb-2 bg-yellow-100 py-3 rounded-lg border border-yellow-200 shadow-inner"
+                    id="processing-stage-text">Initializing pipeline...</p>
+                {% endif %}
+                <p class="text-sm text-yellow-600">This page will update automatically.</p>
+            </div>
+        </div>
+
+        {% elif req.status == 'REVIEW' and not is_admin %}
+        <!-- User sees "Pending Review" when not approved -->
+        <div class="apple-card overflow-hidden mb-8 bg-white border-l-4 border-purple-500">
+            <div class="bg-purple-50 p-12 text-center">
+                <div class="text-6xl mb-4">📋</div>
+                <h2 class="text-2xl font-bold text-purple-900 mb-2">Analysis Under Review</h2>
+                <p class="text-purple-700 mb-4">Your analysis has been completed and is currently being reviewed by our
+                    team.</p>
+                <p class="text-sm text-purple-600">You will be notified once the report is ready.</p>
+            </div>
+        </div>
+
+        {% elif req.status == 'REVIEW' and is_admin %}
+        <!-- Admin sees report + approval controls -->
+        <div class="apple-card overflow-hidden mb-8 bg-white border-l-4 border-purple-500">
+            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100 p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="text-3xl">📋</div>
+                        <div>
+                            <h2 class="text-xl font-bold text-purple-900">Report Pending Approval</h2>
+                            <p class="text-purple-700 text-sm">Review the user-facing report below, then approve or
+                                edit.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="{% url 'admin_edit_report' req.id %}"
+                            class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
+                            ✏️ Edit Report
+                        </a>
+                        <form method="post" action="{% url 'admin_approve_report' req.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit"
+                                onclick="return confirm('Approve this report? It will become visible to the user.')"
+                                class="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition">
+                                ✅ Approve & Release
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="p-8">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">User-Facing Report Preview
+                </h3>
+
+                {% if model_cards %}
+                <!-- Per-Model Cards (New Format) -->
+                {% for card in model_cards %}
+                <div class="model-card mb-6 border border-dashed border-gray-300 rounded-xl overflow-hidden bg-gray-50">
+                    <div class="model-card-header bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+                        <h3 class="text-white text-lg font-bold">Model {{ card.model_number }}</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <!-- Prediction -->
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Prediction</h4>
+                            <div class="flex items-center gap-3">
+                                <span class="prediction-badge px-3 py-1.5 rounded-full text-sm font-bold
+                                            {% if card.prediction_label == 'Fake' or card.prediction_label == 'Deepfake' %}bg-red-100 text-red-700
+                                            {% elif card.prediction_label == 'Real' %}bg-green-100 text-green-700
+                                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                    {{ card.prediction_label }}
+                                </span>
+                                {% if card.prediction_score != 'N/A' %}
+                                <span class="text-sm font-mono text-gray-600">
+                                    Score:
+                                    <strong
+                                        class="{% if card.prediction_score > 0.5 %}text-red-600{% else %}text-green-600{% endif %}">
+                                        {{ card.prediction_score }}
+                                    </strong>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Visual Output -->
+                        {% if card.evidence_url %}
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                                Visual Output
+                                {% if card.evidence_type == 'gradcam' %}
+                                <span
+                                    class="ml-2 px-2 py-0.5 bg-orange-100 text-orange-600 text-xs rounded-full font-semibold">Heatmap</span>
+                                {% elif card.evidence_type == 'mask' %}
+                                <span
+                                    class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full font-semibold">Mask</span>
+                                {% endif %}
+                            </h4>
+                            <img src="{{ card.evidence_url }}" alt="Model {{ card.model_number }} visual output"
+                                class="rounded-lg shadow-md max-h-64 cursor-pointer hover:shadow-xl transition"
+                                onclick="openLightbox('{{ card.evidence_url }}', 'Model {{ card.model_number }} — Visual Output')">
+                        </div>
+                        {% endif %}
+                        <!-- VLM Reasoning -->
+                        {% if card.vlm_reasoning %}
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Analysis
+                                Reasoning</h4>
+                            <p
+                                class="text-gray-700 leading-relaxed text-sm bg-white rounded-lg p-4 border border-gray-200">
+                                {{ card.vlm_reasoning }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% elif report_to_show %}
+                <!-- Old Markdown Format (Backward Compat) -->
+                <div class="prose prose-lg max-w-none text-gray-700 border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50"
+                    id="report-content">
+                    <div class="hidden" id="raw-markdown">{{ report_to_show }}</div>
+                </div>
+                {% else %}
+                <p class="text-gray-400 italic">No report content available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% elif req.status == 'COMPLETED' %}
+        <!-- Approved report -->
+        <div class="apple-card overflow-hidden mb-8 bg-white">
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-8">
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl">✅</div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-green-900 mb-1">Analysis Complete</h2>
+                        <p class="text-green-700">
+                            {% if is_admin %}
+                            Report approved
+                            {% if req.approved_by %} by {{ req.approved_by.username }}{% endif %}
+                            {% if req.approved_at %} on {{ req.approved_at|date:"M d, Y H:i" }}{% endif %}.
+                            {% else %}
+                            Your media has been analyzed. See detailed findings below.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-8">
+                {% if model_cards %}
+                <!-- Per-Model Cards (New Format) -->
+                {% for card in model_cards %}
+                <div
+                    class="model-card mb-6 border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition">
+                    <div class="model-card-header bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+                        <h3 class="text-white text-lg font-bold">Model {{ card.model_number }}</h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <!-- Prediction -->
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Prediction</h4>
+                            <div class="flex items-center gap-3">
+                                <span class="prediction-badge px-3 py-1.5 rounded-full text-sm font-bold
+                                            {% if card.prediction_label == 'Fake' or card.prediction_label == 'Deepfake' %}bg-red-100 text-red-700
+                                            {% elif card.prediction_label == 'Real' %}bg-green-100 text-green-700
+                                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                    {{ card.prediction_label }}
+                                </span>
+                                {% if card.prediction_score != 'N/A' %}
+                                <span class="text-sm font-mono text-gray-600">
+                                    Score:
+                                    <strong
+                                        class="{% if card.prediction_score > 0.5 %}text-red-600{% else %}text-green-600{% endif %}">
+                                        {{ card.prediction_score }}
+                                    </strong>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Visual Output -->
+                        {% if card.evidence_url %}
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                                Visual Output
+                                {% if card.evidence_type == 'gradcam' %}
+                                <span
+                                    class="ml-2 px-2 py-0.5 bg-orange-100 text-orange-600 text-xs rounded-full font-semibold">Heatmap</span>
+                                {% elif card.evidence_type == 'mask' %}
+                                <span
+                                    class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full font-semibold">Mask</span>
+                                {% endif %}
+                            </h4>
+                            <img src="{{ card.evidence_url }}" alt="Model {{ card.model_number }} visual output"
+                                class="rounded-lg shadow-md max-h-64 cursor-pointer hover:shadow-xl transition"
+                                onclick="openLightbox('{{ card.evidence_url }}', 'Model {{ card.model_number }} — Visual Output')">
+                        </div>
+                        {% endif %}
+                        <!-- VLM Reasoning -->
+                        {% if card.vlm_reasoning %}
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Analysis
+                                Reasoning</h4>
+                            <p
+                                class="text-gray-700 leading-relaxed text-sm bg-gray-50 rounded-lg p-4 border border-gray-100">
+                                {{ card.vlm_reasoning }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% elif report_to_show %}
+                <!-- Old Markdown Format (Backward Compat) -->
+                <div class="prose prose-lg max-w-none text-gray-700" id="report-content">
+                    <div class="hidden" id="raw-markdown">{{ report_to_show }}</div>
+                </div>
+                {% else %}
+                <p class="text-gray-400 italic">No report content available.</p>
+                {% endif %}
+            </div>
+            <div class="border-t border-gray-100 bg-gray-50 px-8 py-4 flex gap-3">
+                <button onclick="window.print()"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition">
+                    🖨️ Print Report
+                </button>
+                {% if is_admin %}
+                <a href="{% url 'admin_edit_report' req.id %}"
+                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
+                    ✏️ Edit Report
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% elif req.status == 'FAILED' %}
+        <div class="apple-card overflow-hidden mb-8 bg-white border-l-4 border-red-500">
+            <div class="bg-red-50 p-12 text-center">
+                <div class="text-6xl mb-4">❌</div>
+                <h2 class="text-2xl font-bold text-red-900 mb-2">Analysis Failed</h2>
+                <p class="text-red-700">An error occurred during processing. Please try again or contact support.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ============================================ -->
+        <!-- SECTION 3: Admin-Only Technical Details      -->
+        <!-- ============================================ -->
+        {% if is_admin and model_results_table %}
+        <details class="apple-card group mb-8 bg-white" open>
+            <summary
+                class="cursor-pointer px-8 py-6 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition font-semibold text-gray-900">
+                <span class="flex items-center">
+                    🔧 Technical Details — Model Results
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-gray-600 transition-transform group-open:rotate-180" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+            </summary>
+
+            <div class="border-t border-gray-100 p-8">
+                <!-- Results Table -->
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 text-left">
+                                <th class="px-4 py-3 font-semibold text-gray-700">Model</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700">Score</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700">Prediction</th>
+                                <th class="px-4 py-3 font-semibold text-gray-700">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            {% for r in model_results_table %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 font-semibold text-gray-900">{{ r.name|upper }}</td>
+                                <td class="px-4 py-3 font-mono">
+                                    {% if r.score != 'N/A' %}
+                                    <span
+                                        class="{% if r.score > 0.5 %}text-red-600{% else %}text-green-600{% endif %} font-bold">
+                                        {{ r.score|floatformat:4 }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {% if r.label == 'Fake' or r.label == 'Deepfake' %}
+                                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                        {{ r.label }}
+                                    </span>
+                                    {% elif r.label == 'Real' %}
+                                    <span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                        {{ r.label }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-500">{{ r.label }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span
+                                        class="px-2 py-1 rounded-full text-xs font-bold {% if r.status == 'SUCCESS' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                        {{ r.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Expandable Raw Outputs -->
+                {% for r in model_results_table %}
+                <details class="mb-3 group">
+                    <summary
+                        class="cursor-pointer text-xs font-medium text-gray-600 hover:text-gray-900 flex items-center px-4 py-2 bg-gray-50 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 mr-2 transition-transform group-open:rotate-90" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        {{ r.name|upper }} — Raw Output & Logs
+                    </summary>
+                    <div class="mt-2 space-y-2">
+                        <div class="bg-gray-900 rounded-lg p-3 overflow-x-auto">
+                            <pre class="text-xs text-green-400 font-mono">{{ r.raw }}</pre>
+                        </div>
+                        {% if r.logs %}
+                        <div class="bg-gray-900 rounded-lg p-3 overflow-x-auto max-h-48 overflow-y-auto">
+                            <pre class="text-xs text-yellow-300 font-mono">{{ r.logs }}</pre>
+                        </div>
+                        {% endif %}
+                    </div>
+                </details>
+                {% endfor %}
+            </div>
         </details>
+        {% endif %}
 
         <!-- Back Button -->
-        <a href="{% url 'dashboard' %}" class="inline-flex items-center justify-center w-full py-3 text-gray-600 hover:text-gray-900 font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Dashboard
+        <a href="{% url 'dashboard' %}"
+            class="inline-flex items-center justify-center w-full py-3 text-gray-600 hover:text-gray-900 font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            ← Back to Dashboard
         </a>
+    </div>
+</div>
+
+<!-- Lightbox for evidence images -->
+<div id="lightbox" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center" onclick="closeLightbox()">
+    <div class="relative max-w-4xl max-h-[90vh] p-4" onclick="event.stopPropagation()">
+        <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl">
+        <p id="lightbox-label" class="text-white text-center mt-3 font-medium"></p>
+        <button onclick="closeLightbox()"
+            class="absolute top-2 right-2 text-white bg-black/50 rounded-full w-8 h-8 flex items-center justify-center hover:bg-black/80">✕</button>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Render Markdown Report
+    document.addEventListener('DOMContentLoaded', function () {
+        // Render Markdown Report (backward compat for old format)
         const rawElement = document.getElementById('raw-markdown');
         const contentElement = document.getElementById('report-content');
-        if (rawElement && rawElement.textContent.trim()) {
+        if (rawElement && rawElement.textContent.trim() && contentElement) {
             contentElement.innerHTML = marked.parse(rawElement.textContent);
         }
 
-        // Auto-refresh status via AJAX polling (no page reload)
+        // Auto-refresh for PENDING/PROCESSING/REVIEW states
         const status = "{{ req.status }}";
-        const requestId = {{ req.id }};
-        
-        if (status === 'PENDING' || status === 'PROCESSING') {
+        const requestId = "{{ req.id }}";
+
+        if (status === 'PENDING' || status === 'PROCESSING' || (status === 'REVIEW' && !'{{ is_admin }}')) {
             startStatusPolling(requestId);
         }
     });
 
     function startStatusPolling(requestId) {
-        // Poll every 2 seconds
-        const pollInterval = 2000;
-        
-        const pollTimer = setInterval(function() {
+        const pollInterval = 3000;
+        const pollTimer = setInterval(function () {
             fetch(`/api/request/${requestId}/status/`)
                 .then(response => response.json())
                 .then(data => {
-                    updatePageContent(data);
-                    
-                    // Stop polling when completed or failed
-                    if (data.status !== 'PENDING' && data.status !== 'PROCESSING') {
-                        clearInterval(pollTimer);
+                    if (data.status !== '{{ req.status }}') {
+                        // Status changed — reload to show new state
+                        window.location.reload();
+                    } else if (data.status === 'PROCESSING' || data.status === 'PENDING') {
+                        // Update the active stage in the UI
+                        const pendingModels = data.results.filter(r => r.status === 'PROCESSING');
+                        const finishedCount = data.results.filter(r => r.status === 'SUCCESS' || r.status === 'FAILED').length;
+                        const totalStages = data.selected_models.length + 1; // +1 for VLM
+                        const stageTextEl = document.getElementById('processing-stage-text');
+
+                        if (stageTextEl) {
+                            if (pendingModels.length > 0) {
+                                stageTextEl.innerText = `Currently running: ${pendingModels[0].model_name.toUpperCase()} (Stage ${finishedCount + 1} of ${totalStages})`;
+                            } else {
+                                stageTextEl.innerText = `Preparing next stage...`;
+                            }
+                        }
                     }
                 })
-                .catch(error => {
-                    console.error('Error polling status:', error);
-                });
+                .catch(error => console.error('Polling error:', error));
         }, pollInterval);
     }
 
-    function updatePageContent(data) {
-        // Update status badge
-        const statusBadge = document.querySelector('[class*="bg-green-100"], [class*="bg-red-100"], [class*="bg-yellow-100"]');
-        if (statusBadge) {
-            statusBadge.className = '';
-            if (data.status === 'COMPLETED') {
-                statusBadge.className = 'inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-800';
-                statusBadge.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                    </svg>
-                    COMPLETED
-                `;
-            } else if (data.status === 'FAILED') {
-                statusBadge.className = 'inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-red-100 text-red-800';
-                statusBadge.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                    FAILED
-                `;
-            }
-        }
-        
-        // Update report content if available
-        if (data.report_content && data.report_content.trim()) {
-            const reportContent = document.getElementById('report-content');
-            if (reportContent) {
-                reportContent.innerHTML = marked.parse(data.report_content);
-            }
-        }
+    function openLightbox(url, label) {
+        document.getElementById('lightbox-img').src = url;
+        document.getElementById('lightbox-label').textContent = label;
+        document.getElementById('lightbox').classList.remove('hidden');
+        document.getElementById('lightbox').classList.add('flex');
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.add('hidden');
+        document.getElementById('lightbox').classList.remove('flex');
     }
 </script>
 
@@ -291,7 +509,8 @@
         @apply mb-3 leading-relaxed;
     }
 
-    .prose ul, .prose ol {
+    .prose ul,
+    .prose ol {
         @apply mb-3 ml-4;
     }
 
@@ -305,6 +524,27 @@
 
     .prose pre {
         @apply bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto font-mono text-sm;
+    }
+
+    .prose table {
+        @apply w-full border-collapse mb-4;
+    }
+
+    .prose th,
+    .prose td {
+        @apply border border-gray-200 px-3 py-2 text-sm;
+    }
+
+    .prose th {
+        @apply bg-gray-50 font-semibold;
+    }
+
+    .model-card {
+        transition: all 0.2s ease;
+    }
+
+    .model-card:hover {
+        transform: translateY(-1px);
     }
 </style>
 {% endblock %}
